@@ -6,8 +6,7 @@ IP Tool is a Python-based command-line utility for working with IP addresses. It
 
 1. Clone this repository to your local machine.
 
-2. git clone https://github.com/Blindsinner
-/IPv4-tool-for-beginner.git
+2. git clone https://github.com/Blindsinner/IPv4-tool-for-beginner.git
 
 
 ## Usage
