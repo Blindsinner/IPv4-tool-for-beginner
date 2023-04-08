@@ -49,7 +49,6 @@ def ip_to_binary(ip_address):
         binary_ip = binary_ip.rjust(ip_bits_total, '0')
         return successful(f'Binary IP Address: {".".join([binary_ip[i:i+ip_octet] for i in range(0, ip_bits_total, ip_octet)])}')
 
-
 def network_address(ip_address, subnet_mask):
     """Converts an IP Subnet into its CIDR notation equivalent"""
     try:
@@ -59,7 +58,6 @@ def network_address(ip_address, subnet_mask):
     else:
         return str(successful(f'Network address with CIDR Notation: {ip.network}'))
 
-
 def cidr_to_subnet_mask(ip_address):
     """Converts IPAddress/CIDR into dotted-decimal-notation IPAddress/Subnet Mask"""
     try:
@@ -67,8 +65,7 @@ def cidr_to_subnet_mask(ip_address):
     except ipaddress.AddressValueError:
         print(error("Error: Invalid subnet mask or IP address"))
     else:
-        return str(successful(f'IP Subnet: {network.network_address}\nIP Subnet Mask: {network.netmask}'))
-
+        return str(successful(f'Network address: {network.network_address}\nIP Subnet Mask: {network.netmask}'))
 
 def possible_number_of_subnets(ip_address, subnet_mask):
     try:
@@ -78,7 +75,6 @@ def possible_number_of_subnets(ip_address, subnet_mask):
     else:    
         # get the number of bits left in the host portion
         return successful(f'Possible Number of Subnets: {2 ** (ip_bits_total - ip.prefixlen)}')
-
 
 def ip_class_private_public(ip_address):
     """Is it a Private Address or Public Address? That's what this function answers"""
@@ -125,13 +121,15 @@ def display_all_info(ip_address, subnet_mask_or_cidr):
         cidr = ipaddress.IPv4Network(
             f'{ip_address}/{subnet_mask}', strict=False).prefixlen
         print(successful(f"IP Address: {ip_address}"))
-        print(successful(f"Subnet Mask: {subnet_mask}"))
+        print(successful(f"Network address: {subnet_mask}")) # change here
     finally:    
         print(f"{successful(f'CIDR Notation: {cidr}')}")
         print(possible_number_of_subnets(ip_address, cidr))
         print(network_address(ip_address, cidr))
         print(ip_class_private_public(ip_address))
         print(ip_to_binary(ip_address))
+
+
 
 
 def main_menu():
