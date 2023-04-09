@@ -1,7 +1,6 @@
 import ipaddress
 import sys
 
-
 # ANSI escape sequences for bold red text and reset
 bold_red = "\033[1;31m"  # for errors
 bold_green = "\033[1;32m"  # for successful responses
@@ -11,43 +10,34 @@ reset = "\033[0m"
 ip_bits_total = 32
 ip_octet = 8
 
-
 def successful(text):
     """an easier way to print successful responses"""
     return f"{bold_green}{text}{reset}"
-
 
 def error(text):
     """an easier way to print errors"""
     return f"{bold_red}{text}{reset}"
 
-
 def binary_to_ip(binary_ip):
     """Convert a valid 32-bit value into an IPv4 address"""
-    # Remove dots from the input string
     binary_ip = binary_ip.replace('.', '')
-    # Split the binary string into 4 octets
     octets = [binary_ip[i:i + ip_octet]
               for i in range(0, ip_bits_total, ip_octet)]
-    # Convert each octet to decimal and join with dots to form IP address
     try:
         return successful(f"Decimal IP: {'.'.join(str(int(octet, 2)) for octet in octets)}")
     except ValueError:
         print(error("Error: Probably an incorrect binary value."))
 
-
 def ip_to_binary(ip_address):
     """Convert an IPv4 address into its binary form"""
     try:
         ip = ipaddress.ip_address(ip_address)
-        # cleanup binary value
         binary_ip = bin(int(ip)).replace('0b', '')
     except ValueError as ip_error:
         print(error(ip_error))
     else:
-        # Pad with zeros if necessary
         binary_ip = binary_ip.rjust(ip_bits_total, '0')
-        return successful(f'Binary IP Address: {".".join([binary_ip[i:i+ip_octet] for i in range(0, ip_bits_total, ip_octet)])}')
+        return successful(f'{".".join([binary_ip[i:i+ip_octet] for i in range(0, ip_bits_total, ip_octet)])}')
 
 def network_address(ip_address, subnet_mask):
     """Converts an IP Subnet into its CIDR notation equivalent"""
@@ -73,63 +63,91 @@ def possible_number_of_subnets(ip_address, subnet_mask):
     except ipaddress.AddressValueError:
         print(error("Error: Invalid subnet mask or IP address"))
     else:    
-        # get the number of bits left in the host portion
         return successful(f'Possible Number of Subnets: {2 ** (ip_bits_total - ip.prefixlen)}')
+    
+def ip_class_by_hosts(ip_address, subnet_mask_or_cidr):
+    try:
+        subnet_mask = int(subnet_mask_or_cidr)
+        cidr = subnet_mask_or_cidr
+    except ValueError:
+        subnet_mask = subnet_mask_or_cidr
+        cidr = ipaddress.IPv4Network(
+            f'{ip_address}/{subnet_mask}', strict=False).prefixlen
+    else:
+        ip = ipaddress.IPv4Network(f'{ip_address}/{cidr}', strict=False)
+        total_hosts = ip.num_addresses
 
+        if total_hosts >= 2**16:
+            return "Class A"
+        elif total_hosts >= 2**8:
+            return "Class B"
+        else:
+            return "Class C"
+        
 def ip_class_private_public(ip_address):
     """Is it a Private Address or Public Address? That's what this function answers"""
     try:
-        # confirm validity of address received
         ip = ipaddress.IPv4Address(ip_address)
     except ipaddress.AddressValueError:
         print(error("Error: Invalid Addresss"))
     else:    
         first_octet = int(str(ip).split('.')[0])
-        # class A -> 1 - 126
         if first_octet >= 1 and first_octet <= 126:
             ip_class = 'A'
-        # Class B -> 128 - 191
         elif first_octet <= 191:
             ip_class = 'B'
-        # class C -> 192 - 223
         elif first_octet <= 223:
             ip_class = 'C'
-        # class D -> 224 - 239
         elif first_octet >= 224 and first_octet <= 239:
             ip_class = 'D'
-        # class E -> 240 - 255 
         else:
             ip_class = 'E'
-    
-        # return results    
         if ip.is_private:
-            return f"{successful(f'IP class and private/public: Class {ip_class}, Private')}"
+            return f"{successful(f' According to first octet: Class {ip_class}, Private')}"
         else:
-            return f"{successful(f'IP class and private/public: Class {ip_class}, Public')}"
-        
-    
+            return f"{successful(f' According to first octet: Class {ip_class}, Public')}"
 def display_all_info(ip_address, subnet_mask_or_cidr):
-    """A consolidate view for IP Address info"""
     try:
         subnet_mask = int(subnet_mask_or_cidr)
         cidr = subnet_mask_or_cidr
-        print(successful(f"IP Address: {ip_address}"))
-        print(cidr_to_subnet_mask(f'{ip_address}/{subnet_mask_or_cidr}'))
     except ValueError:
-        # used mostly when subnet mask is given instead of a CIDR
         subnet_mask = subnet_mask_or_cidr
         cidr = ipaddress.IPv4Network(
             f'{ip_address}/{subnet_mask}', strict=False).prefixlen
-        print(successful(f"IP Address: {ip_address}"))
-        print(successful(f"Network address: {subnet_mask}")) # change here
-    finally:    
-        print(f"{successful(f'CIDR Notation: {cidr}')}")
-        print(possible_number_of_subnets(ip_address, cidr))
-        print(network_address(ip_address, cidr))
-        print(ip_class_private_public(ip_address))
-        print(ip_to_binary(ip_address))
+     
+    ip_int = int(ipaddress.IPv4Address(ip_address))
+    ip_hex = hex(ip_int)
+
+    network = ipaddress.IPv4Network(f"{ip_address}/{cidr}", strict=False)
+    total_hosts = network.num_addresses
+    usable_hosts = total_hosts - 2
+    first_address, last_address = list(network.hosts())[0], list(network.hosts())[-1]
+    wildcard_mask = ipaddress.IPv4Address((~int(network.netmask)) & 0xFFFFFFFF)
+    reverse_dns = '.'.join(reversed(ip_address.split('.'))) + '.in-addr.arpa'
 
 
+
+    print(f"IP Address: {successful(ip_address)}")
+    print(f"Subnet Mask: {successful(network.netmask)}")
+    print(f"CIDR Notation: {successful(cidr)}")
+    print(f"Network Address: {successful(network.network_address)}")
+    print(f"Broadcast Address: {successful(network.broadcast_address)}")
+    print(f"Network Address with CIDR Notation: {successful(network)}")
+    print(f"Possible Number of Subnets: {successful(2 ** (ip_bits_total - int(cidr)))}")
+    print(f"Total Number of Hosts: {successful(total_hosts)}")
+    print(f"Number of Usable Hosts: {successful(usable_hosts)}")
+    print(f"IP class and private/public:{successful(ip_class_private_public(ip_address))}")
+    print(f"IP Class (based on total number of hosts): {successful(ip_class_by_hosts(ip_address, subnet_mask_or_cidr))}")
+    print(f"Binary Version of IP: {ip_to_binary(ip_address)}")
+    subnet_mask_str = str(ipaddress.IPv4Network(f'0.0.0.0/{cidr}', strict=False).netmask)
+    print(f"Binary Subnet Mask: {successful('.'.join([bin(int(octet))[2:].rjust(8, '0') for octet in subnet_mask_str.split('.')]))}")
+    print(f"Usable Host IP Range: {successful(f'{first_address} - {last_address}')}")
+    print(f"Integer ID:\t{successful(ip_int)}")
+    print(f"Hex ID:\t\t{successful(ip_hex)}")
+    print(f"in-addr.arpa:\t{successful(reverse_dns)}")
+    print(f"Wildcard Mask: {successful(wildcard_mask)}")
+    print(f"IPv4 Mapped Address: {successful(ipaddress.IPv6Address(f'::ffff:{ip_address}'))}")
+    print(successful(f"6to4 Prefix: 2002:{int(ip_address.split('.')[0]):02x}{int(ip_address.split('.')[1]):02x}:{int(ip_address.split('.')[2]):02x}{int(ip_address.split('.')[3]):02x}::/48"))
 
 
 def main_menu():
@@ -142,11 +160,8 @@ def main_menu():
     print("6. Determine IP Class and Private/Public Status")
     print("7. Display All Information for an IP Address and Subnet")
     print("8. Exit\n")
-
-
 def run_tool():
     running = True
-
     while running:
         main_menu()
         try:
@@ -162,7 +177,6 @@ def run_tool():
                         # Binary to IP
                         binary_ip = input("Enter the binary IP address: ")
                         print(binary_to_ip(binary_ip))
-
                     case 2:
                         # IP to binary
                         ip_address = input("Enter the IP address: ")
@@ -197,16 +211,17 @@ def run_tool():
                         display_all_info(ip_address, subnet_mask_or_cidr)
 
                     case 8:
-                        # exit
+                    # exit
                         sys.exit(successful('Exiting...'))
 
                     case _:
-                        # input validation
+                    # input validation
                         print(error('Invalid option. Please try again.'))
-            
+        
             except (KeyboardInterrupt, EOFError):
                 sys.exit(error("Exited"))
-
-
+    
 if __name__ == "__main__":
     run_tool()
+    
+
