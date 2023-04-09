@@ -73,29 +73,8 @@ Possible Number of Subnets: 32`
 
 ### Display all information for an IP address and subnet
 
-`Enter the IP address: 192.168.1.1`
-`Enter the subnet mask or CIDR notation: 255.255.255.0`
-`IP Address: 192.168.1.1`
-`Subnet Mask: 255.255.255.0`
-`CIDR Notation: 24`
-`Network Address: 192.168.1.0`
-`Broadcast Address: 192.168.1.255`
-`Network Address with CIDR Notation: 192.168.1.0/24`
-`Possible Number of Subnets: 1`
-`Total Number of Hosts: 256`
-`Number of Usable Hosts: 254`
-`IP class and private/public: According to first octet: Class C, Private`
-`IP Class (based on total number of hosts): Class C`
-`Binary Version of IP: 11000000.10101000.00000001.00000001`
-`Binary Subnet Mask: 11111111.11111111.11111111.00000000`
-`Usable Host IP Range: 192.168.1.1 - 192.168.1.254`
-`Integer ID:` `3232235777``
-``Hex ID:         0xc0a80101`
-`in-addr.arpa:   1.1.168.192.in-addr.arpa`
-`Wildcard Mask:  0.0.0.255`
-`IPv4 Mapped Address: ::ffff:192.168.1.1`
-`6to4 Prefix:    2002:c0a8:0101::/48` 
 
+![Example of Display All Information](https://prnt.sc/lVPaRJtd1NhX)
 Follow the on-screen prompts to perform various IP-related tasks.
 
 ## Contributing
