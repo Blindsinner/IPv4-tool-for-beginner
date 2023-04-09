@@ -74,7 +74,8 @@ Possible Number of Subnets: 32`
 ### Display all information for an IP address and subnet
 
 
-![Example of Display All Information](https://prnt.sc/lVPaRJtd1NhX)
+![Example of Display All Information](https://github.com/Blindsinner/IPv4-tool-for-beginner/blob/main/Screenshot_6.png)
+
 Follow the on-screen prompts to perform various IP-related tasks.
 
 ## Contributing
