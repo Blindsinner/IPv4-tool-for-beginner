@@ -1,11 +1,10 @@
-from ip_tool import error
 from ip_tool import successful
 from ip_tool import ip_class_private_public
 from ip_tool import cidr_to_subnet_mask
 from ip_tool import network_address
 from ip_tool import ip_to_binary
 from ip_tool import binary_to_ip
-import sys
+from ip_tool import get_binary_subnet_mask
 import unittest
 
 
@@ -41,7 +40,7 @@ class TestIPAddress(unittest.TestCase):
 
 class TestNetworkAddress(unittest.TestCase):
     def test_network_address(self):
-        """Test conversion from IP Address and Dotted Decimal Notaion Subnet Mask to IPAddress/CIDR"""
+        """Test conversion from IP Address and Dotted Decimal Notation Subnet Mask to IPAddress/CIDR"""
         self.assertEqual(network_address("192.168.10.1", "255.255.255.0"),
                          successful("Network address with CIDR Notation: 192.168.10.0/24"))
 
@@ -50,32 +49,40 @@ class TestNetworkAddress(unittest.TestCase):
         self.assertEqual(cidr_to_subnet_mask("172.16.30.15/25"),
                          successful("Network Address: 172.16.30.0\nSubnet Mask: 255.255.255.128"))
 
+    def test_binary_subnet_mask(self):
+        """Tests for subnet mask to binary conversion"""
+        self.assertEqual("11111111.11111111.11111111.00000000", get_binary_subnet_mask("255.255.255.0"))
+        # for class B subnet mask
+        self.assertEqual("11111111.11111111.00000000.00000000", get_binary_subnet_mask("255.255.0.0"))
+        # for class A subnet mask
+        self.assertEqual("11111111.00000000.00000000.00000000", get_binary_subnet_mask("255.0.0.0"))
+
 
 class TestIPClass(unittest.TestCase):
     def test_ip_private_class(self):
         """Checks if IP is private"""
         self.assertEqual(ip_class_private_public("10.50.200.5"),
-                         successful("IP class and private/public: Class A, Private"))
+                         successful("Network Class: A\nAddress Type: Private"))
 
         self.assertEqual(ip_class_private_public("172.16.40.21"),
-                         successful("IP class and private/public: Class B, Private"))
+                         successful("Network Class: B\nAddress Type: Private"))
 
         self.assertEqual(ip_class_private_public("192.168.100.10"),
-                         successful("IP class and private/public: Class C, Private"))
+                         successful("Network Class: C\nAddress Type: Private"))
 
     def test_ip_public_class(self):
         """Checks if IP is public"""
         self.assertEqual(ip_class_private_public("8.8.8.8"),
-                         successful("IP class and private/public: Class A, Public"))
+                         successful("Network Class: A\nAddress Type: Public"))
 
         self.assertEqual(ip_class_private_public("13.107.42.14"),
-                         successful("IP class and private/public: Class A, Public"))
+                         successful("Network Class: A\nAddress Type: Public"))
 
         self.assertEqual(ip_class_private_public("142.250.200.78"),
-                         successful("IP class and private/public: Class B, Public"))
+                         successful("Network Class: B\nAddress Type: Public"))
 
         self.assertEqual(ip_class_private_public("193.43.21.1"),
-                         successful("IP class and private/public: Class C, Public"))
+                         successful("Network Class: C\nAddress Type: Public"))
 
 
 if __name__ == '__main__':
