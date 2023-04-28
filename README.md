@@ -76,6 +76,8 @@ Possible Number of Subnets: 32`
 
 ![Example of Display All Information](https://github.com/Blindsinner/IPv4-tool-for-beginner/blob/main/Screenshot_6.png)
 
+### Download .exe file to use in windows
+
 Follow the on-screen prompts to perform various IP-related tasks.
 
 ## Contributing
