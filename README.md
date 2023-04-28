@@ -78,7 +78,7 @@ Possible Number of Subnets: 32`
 
 ### Download .exe file to use in windows (Requiere Python 3.11 installed)
 
-!(https://github.com/Blindsinner/IPv4-tool-for-beginner/commit/6f2c1cb4e7821ab9ac187a3f1bc2ebddc26cdf68)
+[Download Exe File Here](https://github.com/Blindsinner/IPv4-tool-for-beginner/commit/6f2c1cb4e7821ab9ac187a3f1bc2ebddc26cdf68)
 
 Follow the on-screen prompts to perform various IP-related tasks.
 
